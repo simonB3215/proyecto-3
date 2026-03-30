@@ -1,19 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Heart, Search, Filter, Loader2 } from 'lucide-react';
+import { ShoppingCart, Heart, Search, Filter, Loader2, Check } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
+import { useShop } from '../context/ShopContext';
 
 const placeholderImages = {
   'Electrónica': 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=500&h=500&fit=crop',
   'Ropa': 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e07?w=500&h=500&fit=crop',
+  'Poleras': 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop',
+  'Polerones': 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500&h=500&fit=crop',
+  'Pantalones': 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=500&h=500&fit=crop',
+  'Calzado': 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500&h=500&fit=crop',
   'Hogar': 'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=500&h=500&fit=crop',
   'Deportes': 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=500&h=500&fit=crop',
   'Default': 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=500&h=500&fit=crop'
 };
 
 const Shop = () => {
+  const { addToCart, toggleFavorite, isFavorite } = useShop();
   const [hoveredProduct, setHoveredProduct] = useState(null);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [addedToast, setAddedToast] = useState(null);
 
   useEffect(() => {
     fetchProducts();
@@ -43,10 +50,16 @@ const Shop = () => {
   };
 
   const getImageUrl = (url, categoryName) => {
-    if (!url || url.startsWith('img/')) {
+    if (!url || url.length < 5 || url.startsWith('img/')) {
       return placeholderImages[categoryName] || placeholderImages['Default'];
     }
     return url;
+  };
+
+  const handleAddToCart = (product) => {
+    addToCart(product);
+    setAddedToast(product.id);
+    setTimeout(() => setAddedToast(null), 2000);
   };
 
   return (
@@ -129,6 +142,7 @@ const Shop = () => {
                     Stock: {product.stock}
                   </div>
                   <button 
+                    onClick={(e) => { e.stopPropagation(); toggleFavorite(product.id); }}
                     style={{
                       position: 'absolute',
                       top: '1rem',
@@ -143,10 +157,11 @@ const Shop = () => {
                       justifyContent: 'center',
                       cursor: 'pointer',
                       backdropFilter: 'blur(4px)',
-                      color: 'white'
+                      color: isFavorite(product.id) ? 'var(--gold-main)' : 'white',
+                      transition: 'all 0.2s ease'
                     }}
                   >
-                    <Heart size={18} />
+                    <Heart size={18} fill={isFavorite(product.id) ? 'var(--gold-main)' : 'none'} color={isFavorite(product.id) ? 'var(--gold-main)' : 'white'} />
                   </button>
                 </div>
                 
@@ -159,8 +174,17 @@ const Shop = () => {
                   </h3>
                   <div className="flex justify-between items-center" style={{ marginTop: '1.5rem' }}>
                     <span style={{ fontSize: '1.25rem', fontWeight: 600 }}>${Number(product.precio).toLocaleString()}</span>
-                    <button className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem' }} disabled={product.stock === 0}>
-                      <ShoppingCart size={18} /> {product.stock > 0 ? 'Añadir' : 'Agotado'}
+                    <button 
+                      className="btn btn-primary" 
+                      style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} 
+                      disabled={product.stock === 0}
+                      onClick={() => handleAddToCart(product)}
+                    >
+                      {addedToast === product.id ? (
+                        <><Check size={18} /> Añadido</>
+                      ) : (
+                        <><ShoppingCart size={18} /> {product.stock > 0 ? 'Añadir' : 'Agotado'}</>
+                      )}
                     </button>
                   </div>
                 </div>
@@ -184,3 +208,4 @@ const Shop = () => {
 };
 
 export default Shop;
+

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import { ShoppingCart, LogIn, Menu, X } from 'lucide-react';
+import { ShoppingCart, Heart, LogIn, Menu, X } from 'lucide-react';
+import { useShop } from '../context/ShopContext';
 
 const Navigation = () => {
+  const { cartItemsCount, favorites } = useShop();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -86,8 +88,31 @@ const Navigation = () => {
 
           {/* Actions */}
           <div className="flex items-center gap-4">
-            <button className="btn btn-ghost" aria-label="Cart" style={{ padding: '0.5rem' }}>
+            <button className="btn btn-ghost" aria-label="Favorites" style={{ padding: '0.5rem', position: 'relative' }}>
+              <Heart size={20} />
+              {favorites.length > 0 && (
+                <span style={{ 
+                  position: 'absolute', top: '-5px', right: '-5px', 
+                  background: 'var(--gold-main)', color: 'black', 
+                  borderRadius: '50%', width: '18px', height: '18px', 
+                  fontSize: '0.7rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' 
+                }}>
+                  {favorites.length}
+                </span>
+              )}
+            </button>
+            <button className="btn btn-ghost" aria-label="Cart" style={{ padding: '0.5rem', position: 'relative' }}>
               <ShoppingCart size={20} />
+              {cartItemsCount > 0 && (
+                <span style={{ 
+                  position: 'absolute', top: '-5px', right: '-5px', 
+                  background: 'var(--gold-main)', color: 'black', 
+                  borderRadius: '50%', width: '18px', height: '18px', 
+                  fontSize: '0.7rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' 
+                }}>
+                  {cartItemsCount}
+                </span>
+              )}
             </button>
             <button className="btn btn-primary" style={{ padding: '0.4rem 1rem', fontSize: '0.9rem' }}>
               <LogIn size={16} /> Entrar
