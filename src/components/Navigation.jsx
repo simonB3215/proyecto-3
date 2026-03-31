@@ -88,7 +88,7 @@ const Navigation = () => {
 
           {/* Actions */}
           <div className="flex items-center gap-4">
-            <button className="btn btn-ghost" aria-label="Favorites" style={{ padding: '0.5rem', position: 'relative' }}>
+            <Link to="/favorites" className="btn btn-ghost" aria-label="Favorites" style={{ padding: '0.5rem', position: 'relative' }}>
               <Heart size={20} />
               {favorites.length > 0 && (
                 <span style={{ 
@@ -100,8 +100,8 @@ const Navigation = () => {
                   {favorites.length}
                 </span>
               )}
-            </button>
-            <button className="btn btn-ghost" aria-label="Cart" style={{ padding: '0.5rem', position: 'relative' }}>
+            </Link>
+            <Link to="/cart" className="btn btn-ghost" aria-label="Cart" style={{ padding: '0.5rem', position: 'relative' }}>
               <ShoppingCart size={20} />
               {cartItemsCount > 0 && (
                 <span style={{ 
@@ -113,7 +113,7 @@ const Navigation = () => {
                   {cartItemsCount}
                 </span>
               )}
-            </button>
+            </Link>
             <button className="btn btn-primary" style={{ padding: '0.4rem 1rem', fontSize: '0.9rem' }}>
               <LogIn size={16} /> Entrar
             </button>
