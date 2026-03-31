@@ -30,7 +30,7 @@ const Blog = () => {
             gap: '1.5rem'
           }}>
             <p>
-              Todos tenemos ese recuerdo: largas filas, productos que no inspiran confianza, y una experiencia que drena energía en lugar de revitalizarnos. Ir al supermercado solía ser una tarea tediosa, algo que *debíamos* hacer.
+              Todos tenemos ese recuerdo: buscar la excelencia y conformarnos con lo ordinario. Hace varios años, decidimos que esta narrativa debía cambiar. El Dorado no nació solo como un supermercado comercial, sino como un proyecto de pasión, impulsado por una misión clara: redefinir el estándar de calidad en la industria del retail.
             </p>
             
             <div style={{ 
@@ -42,25 +42,25 @@ const Blog = () => {
               color: 'var(--text-primary)',
               margin: '1rem 0'
             }}>
-              "Decidimos crear El Dorado con una sola tesis: Tu tiempo y tu nutrición valen exactamente eso, oro puro."
+              "Decidimos crear El Dorado con un pilar fundacional: Tu tiempo, tu estilo y tu bienestar valen exactamente eso, oro puro."
             </div>
 
             <p>
-              Cuando empezamos a diseñar la plataforma (Phase 1, nuestro Dashboard), nos dimos cuenta del inmenso poder de los datos para predecir cuándo el pescado más fresco tocaba puerto, o qué granja local tenía la cosecha de arándanos en su punto óptimo de madurez.
+              Desde los primeros días de la fundación de la empresa, nos obsesionamos con el poder del detalle. Viajamos y conectamos directamente con los artesanos, los productores agrícolas más dedicados y los diseñadores más exclusivos. Queríamos asegurar que cada artículo en nuestros estantes tuviera una procedencia impecable.
             </p>
 
-            <h3 className="heading-md" style={{ color: 'var(--text-primary)', marginTop: '2rem' }}>El Estándar Dorado</h3>
+            <h3 className="heading-md" style={{ color: 'var(--text-primary)', marginTop: '2rem' }}>La Promesa Dorada</h3>
 
             <p>
-              Llamarlo "supermercado" se queda corto. Es una selección curada. Si una manzana tiene nuestra etiqueta, pasó por tres filtros de calidad. En nuestra <span style={{ color: 'var(--gold-main)', fontWeight: 500 }}>Fase 2 (E-commerce)</span>, simplificamos la compra para que la belleza y transparencia orgánicas hablaran por sí mismas.
-            </p>
-
-            <p>
-              Y no es solo el producto. Es la experiencia en nuestras puertas digitales, nuestra <span style={{ color: 'var(--gold-main)', fontWeight: 500 }}>Fase 3</span>. Es hacer de la alimentación premium no un lujo opaco, sino un servicio eficiente y transparente, accesible como nunca antes.
+              Para nosotros, llamarlo "catálogo" se queda corto; es una selección curada. Si un producto (desde una prenda hasta la tecnología de tu hogar) lleva nuestro sello de aprobación, significa que ha atravesado nuestros rigurosos filtros de calidad corporativos. Nuestra empresa se fundamenta en la transparencia total y en la firme creencia de que el consumidor merece siempre lo extraordinario.
             </p>
 
             <p>
-              Bienvenidos a El Dorado. Esperamos que disfrute cada compra tanto como nosotros disfrutamos construyendo este espacio para usted.
+              Y no es solo el producto, es la comunidad y el legado que estamos construyendo. Nuestro compromiso como corporación es hacer que lo premium sea accesible y que la experiencia de comprar recupere ese sentimiento de magia, elegancia y exclusividad extrema.
+            </p>
+
+            <p>
+              Bienvenidos a la nueva era del retail. Esperamos que disfrute cada aspecto de El Dorado tanto como nosotros hemos disfrutado forjando sus bases para usted.
             </p>
 
             <div style={{ marginTop: '3rem', paddingTop: '2rem', borderTop: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', gap: '1rem' }}>
