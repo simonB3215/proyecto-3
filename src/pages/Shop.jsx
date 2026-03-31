@@ -119,6 +119,10 @@ const Shop = () => {
                   <img 
                     src={getImageUrl(product.imagen_url, catName)} 
                     alt={product.nombre} 
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = placeholderImages[catName] || placeholderImages['Default'];
+                    }}
                     style={{
                       width: '100%', 
                       height: '100%', 
