@@ -1,184 +1,314 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
-  BarChart, Bar
-} from 'recharts';
-import { TrendingUp, Users, DollarSign, Package, Loader2 } from 'lucide-react';
+import { Package, AlertTriangle, Users, ShieldAlert, Loader2, Database, Laptop, RefreshCw } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [productos, setProductos] = useState([]);
+  const [usuarios, setUsuarios] = useState([]);
   const [metrics, setMetrics] = useState({
-    ingresos: 0,
-    usuarios: 0,
-    pedidosTotal: 0,
-    conversion: '4.8%' // Static for now as we don't have visits data
+    totalProductos: 0,
+    stockCritico: 0,
+    totalUsuarios: 0,
+    admins: 0
   });
-  const [salesData, setSalesData] = useState([]);
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
-  const fetchDashboardData = async () => {
+  const fetchData = async () => {
     try {
-      setLoading(true);
+      setRefreshing(true);
+      // 1. Obtener Productos y Categorías
+      const { data: prodData, error: prodErr } = await supabase
+        .from('productos')
+        .select(`id, nombre, precio, stock, estado, fecha_creacion, categorias(nombre)`)
+        .order('stock', { ascending: true }); // Priorizamos ver los de menor stock
       
-      // 1. Fetch Users Count
-      const { count: usersCount, error: usersErr } = await supabase
+      // 2. Obtener Usuarios
+      const { data: userData, error: userErr } = await supabase
         .from('usuarios')
-        .select('*', { count: 'exact', head: true });
-        
-      // 2. Fetch Pedidos for metrics and charts
-      const { data: pedidosData, error: pedidosErr } = await supabase
-        .from('pedidos')
-        .select('total, fecha_pedido')
-        .neq('estado', 'cancelado'); // active orders
+        .select(`id, nombre, apellido, email, telefono, rol, fecha_registro`)
+        .order('fecha_registro', { ascending: false });
 
-      if (usersErr || pedidosErr) {
-        console.error("Error fetching dashboard data", usersErr, pedidosErr);
-        return;
-      }
+      if (prodErr || userErr) throw (prodErr || userErr);
 
-      // Calculate Totals
-      let totalIngresos = 0;
-      let orderCount = pedidosData ? pedidosData.length : 0;
-      
-      // Temporary object to group sales by day of week
-      const daysStr = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-      const groupedByDay = { 'Lun': 0, 'Mar': 0, 'Mié': 0, 'Jue': 0, 'Vie': 0, 'Sáb': 0, 'Dom': 0 };
+      const prods = prodData || [];
+      const users = userData || [];
 
-      pedidosData?.forEach(p => {
-        const val = Number(p.total);
-        totalIngresos += val;
-        
-        // Assuming fecha_pedido is a valid date string
-        const d = new Date(p.fecha_pedido);
-        const dayName = daysStr[d.getDay()];
-        groupedByDay[dayName] = (groupedByDay[dayName] || 0) + val;
-      });
-
-      // Format for recharts
-      const chartData = daysStr.map(day => ({
-        name: day,
-        ventas: groupedByDay[day]
-      }));
-
-      // Shift array so Monday is first
-      const sundayIdx = chartData.findIndex(d => d.name === 'Dom');
-      const sundayItem = chartData.splice(sundayIdx, 1)[0];
-      chartData.push(sundayItem); // push to end or keep order, let's keep Mon-Sun order.
+      setProductos(prods);
+      setUsuarios(users);
 
       setMetrics({
-        ingresos: totalIngresos,
-        usuarios: usersCount || 0,
-        pedidosTotal: orderCount,
-        conversion: '4.8%' // Mocked based on visits we don't track
+        totalProductos: prods.length,
+        stockCritico: prods.filter(p => p.stock <= 5).length,
+        totalUsuarios: users.length,
+        admins: users.filter(u => u.rol === 'admin').length
       });
-      setSalesData(chartData);
 
     } catch (e) {
-      console.error(e);
+      console.error("Error cargando dashboard:", e);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center" style={{ height: '80vh' }}>
+        <Loader2 size={48} color="var(--gold-main)" className="animate-spin" />
+      </div>
+    );
+  }
+
   return (
-    <div className="animate-fade-in" style={{ padding: '2rem 1rem', background: 'var(--bg-primary)', minHeight: '90vh' }}>
-      <div className="container">
-        <header className="flex justify-between items-center" style={{ marginBottom: '2.5rem' }}>
+    <div className="admin-layout animate-fade-in" style={{ padding: '2rem 1.5rem', minHeight: '90vh' }}>
+      
+      {/* HEADER TÉCNICO */}
+      <header className="flex justify-between items-center" style={{ marginBottom: '2rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
+        <div className="flex items-center gap-3">
+          <Database color="var(--gold-main)" size={28} />
           <div>
-            <h1 className="heading-lg">Panel de <span className="text-gradient-gold">Control</span></h1>
-            <p className="text-muted">Resumen de operaciones en tiempo real.</p>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 600, letterSpacing: '-0.5px', margin: 0 }}>
+              PANEL DE <span className="text-gradient-gold">OPERACIONES</span>
+            </h1>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontFamily: 'monospace', margin: '0.2rem 0 0 0' }}>
+              SYS_STATUS: ONLINE | LATENCY: ~45ms | DB_CONN: ESTABLISHED
+            </p>
           </div>
-          <button className="btn btn-outline" style={{ padding: '0.5rem 1rem' }} onClick={fetchDashboardData}>
-            Actualizar Datos
-          </button>
-        </header>
+        </div>
+        <button 
+          onClick={fetchData} 
+          disabled={refreshing}
+          className="btn" 
+          style={{ padding: '0.5rem 1rem', background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', fontFamily: 'monospace' }}
+        >
+          <RefreshCw size={14} className={refreshing ? "animate-spin" : ""} color="var(--gold-main)" /> 
+          SYNC_DATA
+        </button>
+      </header>
 
-        {loading ? (
-          <div className="flex justify-center flex-col items-center" style={{ height: '50vh' }}>
-            <Loader2 size={48} color="var(--gold-main)" className="animate-spin" />
-            <p className="text-muted" style={{ marginTop: '1rem' }}>Obteniendo métricas...</p>
+      {/* MÉTRICAS KPI (Key Performance Indicators) */}
+      <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', marginBottom: '2.5rem' }}>
+        
+        <div className="kpi-card">
+          <div className="kpi-icon"><Package size={20} /></div>
+          <div className="kpi-data">
+            <span className="kpi-label">TOTAL PRODUCTOS</span>
+            <span className="kpi-value">{metrics.totalProductos}</span>
           </div>
-        ) : (
-          <>
-            {/* Overview Stats */}
-            <div className="grid gap-6" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', marginBottom: '3rem' }}>
-              {[
-                { title: 'Ingresos Totales', value: `$${metrics.ingresos.toLocaleString()}`, icon: <DollarSign />, trend: '+12.5%' },
-                { title: 'Usuarios Registrados', value: metrics.usuarios.toLocaleString(), icon: <Users />, trend: '+4.2%' },
-                { title: 'Pedidos Exitosos', value: metrics.pedidosTotal.toLocaleString(), icon: <Package />, trend: '+18.1%' },
-                { title: 'Tasa de Conversión', value: metrics.conversion, icon: <TrendingUp />, trend: '-1.2%' }
-              ].map((stat, i) => (
-                <div key={i} className="card glass-panel flex-col justify-between" style={{ padding: '1.5rem', minHeight: '140px' }}>
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted" style={{ fontWeight: 500 }}>{stat.title}</span>
-                    <span style={{ color: 'var(--gold-main)' }}>{stat.icon}</span>
-                  </div>
-                  <div className="flex justify-between items-end" style={{ marginTop: '1rem' }}>
-                    <span className="heading-md" style={{ fontSize: '2rem' }}>{stat.value}</span>
-                    <span style={{ 
-                      color: stat.trend.startsWith('+') ? '#4ade80' : '#f87171',
-                      background: stat.trend.startsWith('+') ? 'rgba(74, 222, 128, 0.1)' : 'rgba(248, 113, 113, 0.1)',
-                      padding: '0.2rem 0.5rem',
-                      borderRadius: '1rem',
-                      fontSize: '0.8rem',
-                      fontWeight: 600
-                    }}>
-                      {Math.abs(parseFloat(stat.trend))}%
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
+        </div>
 
-            {/* Charts Section */}
-            <div className="grid gap-6" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))' }}>
-              <div className="card glass-panel" style={{ height: '400px', display: 'flex', flexDirection: 'column' }}>
-                <h3 style={{ marginBottom: '1.5rem', color: 'var(--text-secondary)' }}>Evolución de Ventas ($)</h3>
-                <div style={{ flex: 1, minHeight: 0 }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={salesData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" vertical={false} />
-                      <XAxis dataKey="name" stroke="var(--text-secondary)" tick={{fill: 'var(--text-secondary)'}} />
-                      <YAxis stroke="var(--text-secondary)" tick={{fill: 'var(--text-secondary)'}} />
-                      <RechartsTooltip 
-                        contentStyle={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-gold)', borderRadius: '8px' }}
-                        itemStyle={{ color: 'var(--gold-main)' }}
-                        formatter={(value) => `$${value.toLocaleString()}`}
-                      />
-                      <Line type="monotone" dataKey="ventas" stroke="var(--gold-main)" strokeWidth={3} dot={{ r: 4, fill: 'var(--bg-primary)', strokeWidth: 2 }} activeDot={{ r: 6 }} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
+        <div className="kpi-card" style={{ borderColor: metrics.stockCritico > 0 ? 'rgba(239, 68, 68, 0.4)' : 'var(--border-subtle)' }}>
+          <div className="kpi-icon" style={{ color: metrics.stockCritico > 0 ? '#ef4444' : 'var(--gold-main)' }}><AlertTriangle size={20} /></div>
+          <div className="kpi-data">
+            <span className="kpi-label" style={{ color: metrics.stockCritico > 0 ? '#ef4444' : 'var(--text-secondary)' }}>ALERTA STOCK CRÍTICO (&le; 5)</span>
+            <span className="kpi-value" style={{ color: metrics.stockCritico > 0 ? '#ef4444' : 'var(--text-primary)' }}>{metrics.stockCritico}</span>
+          </div>
+        </div>
 
-              <div className="card glass-panel" style={{ height: '400px', display: 'flex', flexDirection: 'column' }}>
-                <h3 style={{ marginBottom: '1.5rem', color: 'var(--text-secondary)' }}>Ventas Acumuladas por Día</h3>
-                <div style={{ flex: 1, minHeight: 0 }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={salesData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" vertical={false} />
-                      <XAxis dataKey="name" stroke="var(--text-secondary)" tick={{fill: 'var(--text-secondary)'}} />
-                      <YAxis stroke="var(--text-secondary)" tick={{fill: 'var(--text-secondary)'}} />
-                      <RechartsTooltip 
-                        contentStyle={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-gold)', borderRadius: '8px' }}
-                        cursor={{fill: 'rgba(255,255,255,0.05)'}}
-                        formatter={(value) => `$${value.toLocaleString()}`}
-                      />
-                      <Bar dataKey="ventas" fill="var(--gold-dark)" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
+        <div className="kpi-card">
+          <div className="kpi-icon"><Users size={20} /></div>
+          <div className="kpi-data">
+            <span className="kpi-label">TOTAL USUARIOS</span>
+            <span className="kpi-value">{metrics.totalUsuarios}</span>
+          </div>
+        </div>
+
+        <div className="kpi-card">
+          <div className="kpi-icon"><ShieldAlert size={20} /></div>
+          <div className="kpi-data">
+            <span className="kpi-label">ADMINISTRADORES</span>
+            <span className="kpi-value">{metrics.admins}</span>
+          </div>
+        </div>
+
+      </div>
+
+      {/* SECCIÓN DE TABLAS DE DATOS */}
+      <div className="grid gap-6" style={{ gridTemplateColumns: '1fr', marginBottom: '3rem' }}>
+        
+        {/* TABLA: INVENTARIO */}
+        <div className="data-panel">
+          <div className="panel-header">
+            <h3>DATOS_INVENTARIO [DB: productos]</h3>
+            <span className="badge">Filas: {productos.length}</span>
+          </div>
+          <div className="table-responsive">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>SKU/ID</th>
+                  <th>PRODUCTO</th>
+                  <th>CATEGORÍA</th>
+                  <th>PRECIO</th>
+                  <th>ESTADO</th>
+                  <th>STOCK</th>
+                </tr>
+              </thead>
+              <tbody>
+                {productos.map(p => (
+                  <tr key={p.id}>
+                    <td className="mono muted">#{String(p.id).padStart(5, '0')}</td>
+                    <td style={{ fontWeight: 500 }}>{p.nombre}</td>
+                    <td className="lowercase">{p.categorias?.nombre || 'N/A'}</td>
+                    <td className="mono">${Number(p.precio).toLocaleString()}</td>
+                    <td>
+                      <span className={`status-pill ${p.estado === 'activo' ? 'active' : 'inactive'}`}>
+                        {p.estado.toUpperCase()}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`stock-badge ${p.stock <= 5 ? 'critical' : p.stock <= 15 ? 'warning' : 'good'}`}>
+                        {p.stock}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* TABLA: USUARIOS */}
+        <div className="data-panel">
+          <div className="panel-header">
+            <h3>REGISTRO_USUARIOS [DB: usuarios]</h3>
+            <span className="badge">Filas: {usuarios.length}</span>
+          </div>
+          <div className="table-responsive">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>UUID</th>
+                  <th>NOMBRE COMPLETO</th>
+                  <th>CORREO ELECTRÓNICO</th>
+                  <th>TELÉFONO</th>
+                  <th>ROL</th>
+                  <th>FECHA REGISTRO</th>
+                </tr>
+              </thead>
+              <tbody>
+                {usuarios.map(u => (
+                  <tr key={u.id}>
+                    <td className="mono muted">usr_{String(u.id).padStart(4, '0')}</td>
+                    <td style={{ fontWeight: 500 }}>{u.nombre} {u.apellido}</td>
+                    <td className="mono" style={{ fontSize: '0.85rem' }}>{u.email}</td>
+                    <td className="mono muted">{u.telefono || 'N/A'}</td>
+                    <td>
+                      <span className={`status-pill ${u.rol === 'admin' ? 'admin' : 'user'}`}>
+                        {String(u.rol).toUpperCase()}
+                      </span>
+                    </td>
+                    <td className="mono muted">{new Date(u.fecha_registro).toLocaleDateString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
 
       <style>{`
+        /* ESTILOS TÉCNICOS PARA EL ADMIN DASHBOARD */
+        .admin-layout {
+          font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        .mono { font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace; }
+        .muted { color: var(--text-secondary); opacity: 0.8; }
+        .lowercase { text-transform: lowercase; }
+
+        .kpi-card {
+          background: rgba(10, 10, 12, 0.4);
+          border: 1px solid var(--border-subtle);
+          border-radius: 8px;
+          padding: 1.25rem 1rem;
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          backdrop-filter: blur(10px);
+          transition: all 0.2s ease;
+        }
+        .kpi-card:hover { border-color: rgba(255, 215, 0, 0.3); background: rgba(255, 215, 0, 0.02); }
+        .kpi-icon { color: var(--gold-main); opacity: 0.8; }
+        .kpi-data { display: flex; flex-direction: column; }
+        .kpi-label { font-size: 0.7rem; letter-spacing: 1px; color: var(--text-secondary); margin-bottom: 0.4rem; font-family: monospace; }
+        .kpi-value { font-size: 1.8rem; font-weight: 600; line-height: 1; font-family: monospace; letter-spacing: -1px; }
+
+        .data-panel {
+          background: rgba(10, 10, 12, 0.6);
+          border: 1px solid var(--border-subtle);
+          border-radius: 8px;
+          overflow: hidden;
+        }
+        .panel-header {
+          padding: 1rem 1.25rem;
+          border-bottom: 1px solid rgba(255,255,255,0.05);
+          background: rgba(0,0,0,0.2);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .panel-header h3 { margin: 0; font-size: 0.9rem; font-family: monospace; letter-spacing: 0.5px; color: var(--gold-light); }
+        .badge { background: rgba(255, 255, 255, 0.1); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-family: monospace; }
+
+        .table-responsive { width: 100%; overflow-x: auto; }
+        .data-table {
+          width: 100%;
+          border-collapse: collapse;
+          text-align: left;
+          font-size: 0.85rem;
+        }
+        .data-table th {
+          padding: 0.75rem 1.25rem;
+          background: rgba(255,255,255,0.02);
+          color: var(--text-secondary);
+          font-family: monospace;
+          font-size: 0.7rem;
+          letter-spacing: 1px;
+          border-bottom: 1px solid rgba(255,255,255,0.05);
+          white-space: nowrap;
+        }
+        .data-table td {
+          padding: 0.85rem 1.25rem;
+          border-bottom: 1px solid rgba(255,255,255,0.03);
+          white-space: nowrap;
+        }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover td { background: rgba(255,215,0,0.02); }
+
+        .status-pill {
+          padding: 0.25rem 0.6rem;
+          border-radius: 12px;
+          font-size: 0.7rem;
+          font-weight: 600;
+          letter-spacing: 0.5px;
+          display: inline-block;
+          font-family: monospace;
+        }
+        .status-pill.active { background: rgba(74, 222, 128, 0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.2); }
+        .status-pill.inactive { background: rgba(156, 163, 175, 0.15); color: #9ca3af; border: 1px solid rgba(156,163,175,0.2); }
+        .status-pill.admin { background: rgba(255, 215, 0, 0.15); color: var(--gold-main); border: 1px solid rgba(255,215,0,0.2); }
+        .status-pill.user { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.2); }
+
+        .stock-badge {
+          padding: 0.25rem 0.6rem;
+          border-radius: 4px;
+          font-weight: 700;
+          font-family: monospace;
+          display: inline-block;
+          min-width: 40px;
+          text-align: center;
+        }
+        .stock-badge.critical { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .stock-badge.warning { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .stock-badge.good { color: var(--text-primary); }
+
         .animate-spin { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
       `}</style>
