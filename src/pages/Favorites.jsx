@@ -5,14 +5,23 @@ import { supabase } from '../lib/supabaseClient';
 import { useShop } from '../context/ShopContext';
 
 const placeholderImages = {
-  'Electrónica': 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=500&h=500&fit=crop',
-  'Ropa': 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e07?w=500&h=500&fit=crop',
-  'Poleras': 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop',
-  'Polerones': 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500&h=500&fit=crop',
-  'Pantalones': 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=500&h=500&fit=crop',
-  'Calzado': 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500&h=500&fit=crop',
-  'Hogar': 'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=500&h=500&fit=crop',
-  'Default': 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=500&h=500&fit=crop'
+  'electrónica': 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=500&h=500&fit=crop',
+  'ropa': 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e07?w=500&h=500&fit=crop',
+  'poleras': 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop',
+  'polera': 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop',
+  'polerones': 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500&h=500&fit=crop',
+  'polerón': 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500&h=500&fit=crop',
+  'pantalones': 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=500&h=500&fit=crop',
+  'pantalon': 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=500&h=500&fit=crop',
+  'calzado': 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500&h=500&fit=crop',
+  'hogar': 'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=500&h=500&fit=crop',
+  'deportes': 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=500&h=500&fit=crop',
+  'default': 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=500&h=500&fit=crop'
+};
+
+const getFallbackImage = (categoryName) => {
+  const normalized = (categoryName || '').trim().toLowerCase();
+  return placeholderImages[normalized] || placeholderImages['default'];
 };
 
 const Favorites = () => {
@@ -50,8 +59,8 @@ const Favorites = () => {
   };
 
   const getImageUrl = (url, categoryName) => {
-    if (!url || url.length < 5 || url.startsWith('img/')) {
-      return placeholderImages[categoryName] || placeholderImages['Default'];
+    if (!url || typeof url !== 'string' || url.trim() === '' || url.length < 5 || url.startsWith('img/')) {
+      return getFallbackImage(categoryName);
     }
     return url;
   };
@@ -91,6 +100,10 @@ const Favorites = () => {
                   <img 
                     src={getImageUrl(product.imagen_url, catName)} 
                     alt={product.nombre} 
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = getFallbackImage(catName);
+                    }}
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />
                   <div style={{
