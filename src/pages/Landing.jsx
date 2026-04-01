@@ -18,8 +18,8 @@ const Landing = () => {
           position: 'absolute',
           top: '10%',
           left: '20%',
-          width: '500px',
-          height: '500px',
+          width: 'min(500px, 100vw)',
+          height: 'min(500px, 100vw)',
           background: 'var(--gold-dark)',
           filter: 'blur(200px)',
           opacity: 0.15,
@@ -53,7 +53,7 @@ const Landing = () => {
             Productos seleccionados de electrónica, hogar y moda con el más alto rigor. Vive la experiencia de comprar como nunca antes.
           </p>
           
-          <div className="flex gap-4" style={{ marginTop: '2.5rem', justifyContent: 'center' }}>
+          <div className="flex flex-col-mobile gap-4 gap-mobile-4 hero-buttons" style={{ marginTop: '2.5rem', justifyContent: 'center', width: '100%' }}>
             <Link to="/shop" className="btn btn-primary" style={{ padding: '1rem 2.5rem', fontSize: '1.125rem' }}>
               <ShoppingBag size={20} /> Explorar Catálogo
             </Link>
@@ -89,6 +89,15 @@ const Landing = () => {
           </div>
         </div>
       </section>
+      {/* CSS For Landing */}
+      <style>{`
+        @media (max-width: 768px) {
+          .hero-buttons .btn {
+            width: 100%;
+            justify-content: center;
+          }
+        }
+      `}</style>
     </div>
   );
 };

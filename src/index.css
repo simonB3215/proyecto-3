@@ -192,3 +192,102 @@ a {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--border-subtle);
 }
+
+/* ==========================================
+   Responsive Media Queries (Mobile First & Max-Widths)
+   ========================================== */
+
+/* Mobile Utilities */
+@media (max-width: 768px) {
+  /* Contenedor principal con menos padding lateral */
+  .container {
+    padding: 0 1.25rem;
+  }
+  
+  /* Reducción de tamaños de fuente en móviles */
+  .heading-xl { font-size: 2.5rem; }
+  .heading-lg { font-size: 2rem; }
+  .heading-md { font-size: 1.5rem; }
+  
+  /* Utilidad para romper flex rows a flex cols en movil */
+  .flex-col-mobile {
+    flex-direction: column !important;
+  }
+  
+  .gap-mobile-4 {
+    gap: 1rem !important;
+  }
+}
+
+/* Base Modal Styles */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 1rem;
+}
+
+.modal-content {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-md);
+  padding: 2rem;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg), var(--shadow-gold);
+  position: relative;
+  /* Animacion simple de entrada */
+  animation: modalIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Modal Form Styles */
+.form-group {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.form-input {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  transition: all var(--transition-fast);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--gold-main);
+  box-shadow: 0 0 0 2px rgba(234, 179, 8, 0.2);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-subtle);
+}

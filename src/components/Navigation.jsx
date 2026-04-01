@@ -87,7 +87,7 @@ const Navigation = () => {
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 gap-md-4">
             <Link to="/favorites" className="btn btn-ghost" aria-label="Favorites" style={{ padding: '0.5rem', position: 'relative' }}>
               <Heart size={20} />
               {favorites.length > 0 && (
@@ -114,7 +114,7 @@ const Navigation = () => {
                 </span>
               )}
             </Link>
-            <button className="btn btn-primary" style={{ padding: '0.4rem 1rem', fontSize: '0.9rem' }}>
+            <button className="btn btn-primary" id="btn-login-desktop" style={{ padding: '0.4rem 1rem', fontSize: '0.9rem' }}>
               <LogIn size={16} /> Entrar
             </button>
             <button 
@@ -136,13 +136,20 @@ const Navigation = () => {
           <NavLink to="/shop" onClick={() => setMobileMenuOpen(false)} className={linkClass}>Tienda</NavLink>
           <NavLink to="/blog" onClick={() => setMobileMenuOpen(false)} className={linkClass}>Blog</NavLink>
           <NavLink to="/dashboard" onClick={() => setMobileMenuOpen(false)} className={linkClass}>Dashboard</NavLink>
+          <button className="btn btn-primary" style={{ padding: '0.8rem 1.5rem', fontSize: '1.2rem', marginTop: '1rem', width: '100%', justifyContent: 'center' }}>
+            <LogIn size={20} /> Entrar
+          </button>
         </nav>
       </div>
 
       <style>{`
+        #btn-login-desktop { display: none; }
+        
         @media (min-width: 768px) {
           #desktop-nav { display: flex !important; }
           #mobile-menu-btn { display: none !important; }
+          #btn-login-desktop { display: inline-flex; }
+          .gap-md-4 { gap: 1rem !important; }
         }
       `}</style>
     </>

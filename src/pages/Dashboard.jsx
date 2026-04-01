@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Package, AlertTriangle, Users, ShieldAlert, Loader2, Database, Laptop, RefreshCw } from 'lucide-react';
+import { Package, AlertTriangle, Users, ShieldAlert, Loader2, Database, Laptop, RefreshCw, Edit, X, Save } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 
 const Dashboard = () => {
@@ -7,6 +7,9 @@ const Dashboard = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [productos, setProductos] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [editForm, setEditForm] = useState({ nombre: '', precio: 0, stock: 0, estado: 'activo' });
+  const [isSaving, setIsSaving] = useState(false);
   const [metrics, setMetrics] = useState({
     totalProductos: 0,
     stockCritico: 0,
@@ -55,6 +58,43 @@ const Dashboard = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const handleEditClick = (product) => {
+    setEditingProduct(product);
+    setEditForm({
+      nombre: product.nombre,
+      precio: product.precio,
+      stock: product.stock,
+      estado: product.estado
+    });
+  };
+
+  const handleSaveProduct = async (e) => {
+    e.preventDefault();
+    if (!editingProduct) return;
+    try {
+      setIsSaving(true);
+      const { error } = await supabase
+        .from('productos')
+        .update({
+          nombre: editForm.nombre,
+          precio: editForm.precio,
+          stock: editForm.stock,
+          estado: editForm.estado
+        })
+        .eq('id', editingProduct.id);
+
+      if (error) throw error;
+      
+      setEditingProduct(null);
+      fetchData(); // Refresh data
+    } catch (err) {
+      console.error("Error al guardar producto:", err);
+      alert("Hubo un error al guardar los cambios.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -147,6 +187,7 @@ const Dashboard = () => {
                   <th>PRECIO</th>
                   <th>ESTADO</th>
                   <th>STOCK</th>
+                  <th>ACCIONES</th>
                 </tr>
               </thead>
               <tbody>
@@ -165,6 +206,11 @@ const Dashboard = () => {
                       <span className={`stock-badge ${p.stock <= 5 ? 'critical' : p.stock <= 15 ? 'warning' : 'good'}`}>
                         {p.stock}
                       </span>
+                    </td>
+                    <td>
+                      <button onClick={() => handleEditClick(p)} className="btn btn-ghost" style={{ padding: '0.4rem', color: 'var(--gold-main)' }} title="Editar Producto">
+                        <Edit size={16} />
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -212,6 +258,82 @@ const Dashboard = () => {
         </div>
 
       </div>
+
+      {/* MODAL DE EDICIÓN */}
+      {editingProduct && (
+        <div className="modal-overlay" onClick={() => !isSaving && setEditingProduct(null)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center" style={{ marginBottom: '1.5rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '1rem' }}>
+              <h2 className="heading-md" style={{ margin: 0 }}>Editar Producto</h2>
+              <button onClick={() => setEditingProduct(null)} className="btn btn-ghost" style={{ padding: '0.5rem' }} disabled={isSaving}>
+                <X size={20} />
+              </button>
+            </div>
+            
+            <form onSubmit={handleSaveProduct}>
+              <div className="form-group">
+                <label className="form-label">Nombre del Producto</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  value={editForm.nombre} 
+                  onChange={(e) => setEditForm({...editForm, nombre: e.target.value})}
+                  required
+                />
+              </div>
+              
+              <div className="form-group">
+                <label className="form-label">Precio ($)</label>
+                <input 
+                  type="number" 
+                  className="form-input" 
+                  value={editForm.precio} 
+                  onChange={(e) => setEditForm({...editForm, precio: e.target.value})}
+                  required
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+
+              <div className="flex gap-4">
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label className="form-label">Stock Actual</label>
+                  <input 
+                    type="number" 
+                    className="form-input" 
+                    value={editForm.stock} 
+                    onChange={(e) => setEditForm({...editForm, stock: e.target.value})}
+                    required
+                    min="0"
+                  />
+                </div>
+                
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label className="form-label">Estado</label>
+                  <select 
+                    className="form-input" 
+                    value={editForm.estado} 
+                    onChange={(e) => setEditForm({...editForm, estado: e.target.value})}
+                    required
+                  >
+                    <option value="activo">Activo</option>
+                    <option value="inactivo">Inactivo</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="form-actions">
+                <button type="button" className="btn btn-ghost" onClick={() => setEditingProduct(null)} disabled={isSaving}>
+                  Cancelar
+                </button>
+                <button type="submit" className="btn btn-primary" disabled={isSaving}>
+                  {isSaving ? <Loader2 size={18} className="animate-spin" /> : <><Save size={18} /> Guardar</>}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <style>{`
         /* ESTILOS TÉCNICOS PARA EL ADMIN DASHBOARD */

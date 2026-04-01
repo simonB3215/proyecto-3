@@ -72,11 +72,11 @@ const Shop = () => {
 
   return (
     <div className="container animate-fade-in" style={{ padding: '2rem 1rem', minHeight: '80vh' }}>
-      <div className="flex justify-between items-center" style={{ marginBottom: '2rem' }}>
-        <h1 className="heading-lg">Catálogo <span className="text-gradient-gold">Dorado</span></h1>
+      <div className="flex flex-col-mobile shop-header gap-mobile-4 justify-between items-center" style={{ marginBottom: '2rem' }}>
+        <h1 className="heading-lg" style={{ alignSelf: 'flex-start' }}>Catálogo <span className="text-gradient-gold">Dorado</span></h1>
         
-        <div className="flex gap-4">
-          <div style={{ position: 'relative' }}>
+        <div className="flex gap-4 w-full-mobile">
+          <div style={{ position: 'relative', flex: 1 }}>
             <Search size={20} color="var(--text-secondary)" style={{ position: 'absolute', top: '10px', left: '12px' }} />
             <input 
               type="text" 
@@ -89,7 +89,7 @@ const Shop = () => {
                 borderRadius: 'var(--radius-full)',
                 outline: 'none',
                 width: '100%',
-                maxWidth: '300px'
+                maxWidth: '400px'
               }}
             />
           </div>
@@ -110,7 +110,7 @@ const Shop = () => {
         </div>
       ) : (
         <div className="grid gap-6" style={{ 
-          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))',
           marginBottom: '4rem' 
         }}>
           {products.map(product => {
@@ -207,6 +207,12 @@ const Shop = () => {
       )}
       
       <style>{`
+        @media (max-width: 768px) {
+          .shop-header { align-items: stretch !important; }
+          .w-full-mobile { width: 100%; flex-wrap: wrap; }
+          .w-full-mobile input { max-width: 100% !important; }
+        }
+        
         .animate-spin {
           animation: spin 1s linear infinite;
         }

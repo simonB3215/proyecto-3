@@ -32,11 +32,11 @@ const Cart = () => {
     <div className="container animate-fade-in" style={{ padding: '2rem 1rem', minHeight: '80vh' }}>
       <h1 className="heading-lg" style={{ marginBottom: '2rem' }}>Tu <span className="text-gradient-gold">Carrito</span></h1>
       
-      <div className="grid gap-8" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', alignItems: 'start' }}>
+      <div className="grid gap-8 cart-container" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 350px), 1fr))', alignItems: 'start' }}>
         {/* Lado izquierdo: Lista de productos */}
         <div className="flex flex-col gap-4">
           {cart.map((item) => (
-            <div key={item.id} className="card flex items-center gap-4" style={{ padding: '1rem' }}>
+            <div key={item.id} className="card flex items-center gap-4 cart-item" style={{ padding: '1rem' }}>
               <div style={{ width: '80px', height: '80px', borderRadius: 'var(--radius)', overflow: 'hidden', flexShrink: 0 }}>
                 <img 
                   src={item.imagen_url && !item.imagen_url.startsWith('img/') ? item.imagen_url : 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e07?w=200&h=200&fit=crop'} 
@@ -129,6 +129,13 @@ const Cart = () => {
           </p>
         </div>
       </div>
+      
+      <style>{`
+        @media (max-width: 768px) {
+          .cart-item { flex-wrap: wrap; justify-content: center; }
+          .cart-container { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </div>
   );
 };
