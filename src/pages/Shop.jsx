@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Heart, Search, Filter, Loader2, Check } from 'lucide-react';
+import { ShoppingCart, Heart, Search, Filter, Loader2, Check, X } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useShop } from '../context/ShopContext';
 
@@ -26,6 +26,7 @@ const getFallbackImage = (categoryName) => {
 const Shop = () => {
   const { addToCart, toggleFavorite, isFavorite } = useShop();
   const [hoveredProduct, setHoveredProduct] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [addedToast, setAddedToast] = useState(null);
@@ -119,9 +120,10 @@ const Shop = () => {
               <div 
                 key={product.id} 
                 className="card product-card" 
-                style={{ padding: '0', overflow: 'hidden', position: 'relative', display: 'flex', flexDirection: 'column' }}
+                style={{ padding: '0', overflow: 'hidden', position: 'relative', display: 'flex', flexDirection: 'column', cursor: 'pointer' }}
                 onMouseEnter={() => setHoveredProduct(product.id)}
                 onMouseLeave={() => setHoveredProduct(null)}
+                onClick={() => setSelectedProduct(product)}
               >
                 <div style={{ position: 'relative', height: '240px', overflow: 'hidden' }}>
                   <img 
@@ -201,9 +203,9 @@ const Shop = () => {
                     <span style={{ fontSize: '1.25rem', fontWeight: 600 }}>${Number(product.precio).toLocaleString()}</span>
                     <button 
                       className="btn btn-primary" 
-                      style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} 
+                      style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem', zIndex: 2 }} 
                       disabled={product.stock === 0}
-                      onClick={() => handleAddToCart(product)}
+                      onClick={(e) => { e.stopPropagation(); handleAddToCart(product); }}
                     >
                       {addedToast === product.id ? (
                         <><Check size={18} /> Añadido</>
@@ -218,6 +220,108 @@ const Shop = () => {
           })}
         </div>
       )}
+      
+      {/* MODAL DEL PRODUCTO COMPLETO */}
+      {selectedProduct && (() => {
+        const catName = selectedProduct.categorias?.nombre || 'General';
+        return (
+          <div 
+            className="animate-fade-in"
+            style={{
+              position: 'fixed', inset: 0, zIndex: 9999,
+              display: 'flex', alignItems: 'center', justifyItems: 'center', justifyContent: 'center',
+              background: 'rgba(0, 0, 0, 0.8)', backdropFilter: 'blur(16px)',
+              padding: '1rem'
+            }}
+            onClick={() => setSelectedProduct(null)}
+          >
+            <div 
+              className="product-modal-content"
+              style={{
+                background: 'var(--bg-primary)',
+                borderRadius: '16px',
+                border: '1px solid var(--border-gold)',
+                width: '100%', maxWidth: '900px',
+                display: 'flex',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 40px rgba(234, 179, 8, 0.1)',
+                overflow: 'hidden',
+                position: 'relative',
+                maxHeight: '90vh'
+              }}
+              onClick={e => e.stopPropagation()}
+            >
+              <button 
+                onClick={() => setSelectedProduct(null)}
+                className="btn-ghost"
+                style={{ position: 'absolute', top: '1rem', right: '1rem', padding: '0.5rem', borderRadius: '50%', zIndex: 10, background: 'rgba(0,0,0,0.5)', color: 'white', border: 'none', cursor: 'pointer' }}
+              >
+                <X size={24} />
+              </button>
+
+              {/* Imagen del lado izquierdo (o arriba en mobile) */}
+              <div className="product-modal-image" style={{ flex: '1 1 50%', minHeight: '350px', position: 'relative', background: '#000' }}>
+                 <img 
+                    src={getImageUrl(selectedProduct.imagen_url, catName)} 
+                    alt={selectedProduct.nombre}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = getFallbackImage(catName);
+                    }}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }}
+                  />
+              </div>
+
+              {/* Contenido derecho (o abajo en mobile) */}
+              <div style={{ flex: '1 1 50%', padding: '2.5rem', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+                <span style={{ fontSize: '0.9rem', color: 'var(--gold-main)', fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+                  {catName}
+                </span>
+                <h2 style={{ fontSize: '2rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-primary)', lineHeight: 1.2 }}>
+                  {selectedProduct.nombre}
+                </h2>
+                <div style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '1.5rem', color: 'white' }}>
+                  ${Number(selectedProduct.precio).toLocaleString()}
+                </div>
+
+                <div style={{ background: 'rgba(255, 255, 255, 0.02)', padding: '1.25rem', borderRadius: '12px', marginBottom: '2rem', border: '1px solid var(--border-subtle)' }}>
+                  <h4 style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Descripción Completa</h4>
+                  <p style={{ color: 'var(--text-primary)', lineHeight: 1.6, fontSize: '1rem', whiteSpace: 'pre-wrap', margin: 0 }}>
+                    {selectedProduct.descripcion || 'Sin descripción disponible para este producto exclusivo.'}
+                  </p>
+                </div>
+                
+                <div style={{ marginTop: 'auto', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                    <button 
+                      className="btn btn-primary" 
+                      style={{ padding: '1rem 2rem', fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyItems: 'center', justifyContent: 'center', gap: '0.75rem', flex: 1, minWidth: '200px' }} 
+                      disabled={selectedProduct.stock === 0}
+                      onClick={() => handleAddToCart(selectedProduct)}
+                    >
+                      {addedToast === selectedProduct.id ? (
+                        <><Check size={20} /> Añadido</>
+                      ) : (
+                        <><ShoppingCart size={20} /> {selectedProduct.stock > 0 ? 'Añadir al Carrito' : 'Agotado'}</>
+                      )}
+                    </button>
+                    <button 
+                      onClick={() => toggleFavorite(selectedProduct.id)}
+                      className="btn btn-outline"
+                      style={{ padding: '1rem', display: 'flex', alignItems: 'center', justifyItems: 'center', justifyContent: 'center', borderRadius: '12px', background: isFavorite(selectedProduct.id) ? 'rgba(234, 179, 8, 0.1)' : 'transparent', borderColor: isFavorite(selectedProduct.id) ? 'var(--gold-main)' : 'var(--border-subtle)' }}
+                    >
+                      <Heart size={24} fill={isFavorite(selectedProduct.id) ? 'var(--gold-main)' : 'none'} color={isFavorite(selectedProduct.id) ? 'var(--gold-main)' : 'white'} />
+                    </button>
+                </div>
+
+                <div style={{ marginTop: '1.5rem', fontSize: '0.85rem', color: selectedProduct.stock <= 5 ? '#ef4444' : 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: selectedProduct.stock > 0 ? (selectedProduct.stock <= 5 ? '#ef4444' : '#10b981') : 'var(--text-secondary)' }}></span>
+                  {selectedProduct.stock > 0 ? `Stock disponible: ${selectedProduct.stock} unidades` : 'No hay stock disponible en este momento'}
+                </div>
+
+              </div>
+            </div>
+          </div>
+        );
+      })()}
       
       <style>{`
         @media (max-width: 768px) {
@@ -244,6 +348,23 @@ const Shop = () => {
         @keyframes spin {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+           .product-modal-content {
+             flex-direction: column !important;
+             max-height: 90vh;
+             overflow-y: auto !important;
+             border-radius: 12px !important;
+           }
+           .product-modal-image {
+             flex: none !important;
+             height: 250px !important;
+             min-height: 250px !important;
+             width: 100% !important;
+             position: relative !important;
+             display: block !important;
+           }
         }
       `}</style>
     </div>

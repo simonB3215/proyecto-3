@@ -28,6 +28,14 @@ const Dashboard = () => {
     admins: usuarios.filter(u => u.rol === 'admin').length
   };
 
+  const statsPorCategoria = productos.reduce((acc, p) => {
+    const catName = p.categorias?.nombre || 'Sin Categoría';
+    if (!acc[catName]) acc[catName] = { cantidad: 0, stock: 0 };
+    acc[catName].cantidad += 1;
+    acc[catName].stock += (parseInt(p.stock) || 0);
+    return acc;
+  }, {});
+
   const fetchData = async () => {
     try {
       setRefreshing(true);
@@ -220,6 +228,26 @@ const Dashboard = () => {
         </div>
       </header>
 
+      {/* BANNER VALOR TOTAL INVENTARIO */}
+      <div className="card animate-fade-in" style={{
+        marginBottom: '2rem',
+        padding: '1.5rem 1.5rem',
+        background: 'linear-gradient(135deg, rgba(234, 179, 8, 0.08) 0%, rgba(10, 10, 12, 0.8) 100%)',
+        border: '1px solid var(--border-gold)',
+        borderLeft: '4px solid var(--gold-main)',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+          <DollarSign color="var(--gold-main)" size={20} />
+          <h2 style={{ fontSize: '0.9rem', color: 'var(--gold-main)', letterSpacing: '1px', margin: 0, textTransform: 'uppercase', fontWeight: 600 }}>Valor Total del Inventario</h2>
+        </div>
+        <div style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', fontWeight: 700, fontFamily: 'monospace', color: 'var(--text-primary)', letterSpacing: '-1px', lineHeight: 1 }}>
+          ${metrics.valorInventario.toLocaleString()}
+        </div>
+      </div>
+
       {/* MÉTRICAS KPI (Key Performance Indicators) */}
       <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', marginBottom: '2.5rem' }}>
         
@@ -236,14 +264,6 @@ const Dashboard = () => {
           <div className="kpi-data">
             <span className="kpi-label">STOCK TOTAL (UNIDADES)</span>
             <span className="kpi-value">{metrics.totalStock.toLocaleString()}</span>
-          </div>
-        </div>
-
-        <div className="kpi-card" style={{ borderColor: 'rgba(255, 215, 0, 0.2)' }}>
-          <div className="kpi-icon" style={{ color: 'var(--gold-main)' }}><DollarSign size={20} /></div>
-          <div className="kpi-data">
-            <span className="kpi-label" style={{ color: 'var(--gold-main)' }}>VALOR INVENTARIO</span>
-            <span className="kpi-value" style={{ color: 'var(--text-primary)' }}>${metrics.valorInventario.toLocaleString()}</span>
           </div>
         </div>
 
@@ -281,6 +301,29 @@ const Dashboard = () => {
           </div>
         </div>
 
+      </div>
+
+      {/* DETALLES POR CATEGORÍA */}
+      <div style={{ marginBottom: '2.5rem' }}>
+        <h3 className="heading-md" style={{ margin: '0 0 1rem 0', fontSize: '1.1rem', color: 'var(--gold-main)' }}>Stock por Categoría</h3>
+        <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
+          {Object.entries(statsPorCategoria).map(([cat, stats]) => (
+            <div key={cat} className="card animate-fade-in" style={{ padding: '1.25rem', background: 'rgba(255, 215, 0, 0.05)', border: '1px solid rgba(255, 215, 0, 0.1)' }}>
+              <h4 style={{ margin: '0 0 1rem 0', color: 'var(--text-primary)', textTransform: 'uppercase', fontSize: '0.85rem', letterSpacing: '0.5px' }}>{cat}</h4>
+              <div className="flex justify-between" style={{ fontSize: '0.85rem', marginBottom: '0.6rem' }}>
+                <span style={{ color: 'var(--text-secondary)' }}>Variedades (SKUs):</span>
+                <span className="mono" style={{ color: 'var(--text-primary)' }}>{stats.cantidad}</span>
+              </div>
+              <div className="flex justify-between" style={{ fontSize: '0.85rem' }}>
+                <span style={{ color: 'var(--text-secondary)' }}>Stock Total:</span>
+                <span className="mono" style={{ fontWeight: 600, color: 'var(--gold-main)' }}>{stats.stock} und</span>
+              </div>
+            </div>
+          ))}
+          {Object.keys(statsPorCategoria).length === 0 && !loading && (
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>No hay información de categorías.</p>
+          )}
+        </div>
       </div>
 
       {/* SIMULADOR FEED */}
@@ -501,10 +544,10 @@ const Dashboard = () => {
           transition: all 0.2s ease;
         }
         .kpi-card:hover { border-color: rgba(255, 215, 0, 0.3); background: rgba(255, 215, 0, 0.02); }
-        .kpi-icon { color: var(--gold-main); opacity: 0.8; }
-        .kpi-data { display: flex; flex-direction: column; }
-        .kpi-label { font-size: 0.7rem; letter-spacing: 1px; color: var(--text-secondary); margin-bottom: 0.4rem; font-family: monospace; }
-        .kpi-value { font-size: 1.8rem; font-weight: 600; line-height: 1; font-family: monospace; letter-spacing: -1px; }
+        .kpi-icon { color: var(--gold-main); opacity: 0.8; flex-shrink: 0; }
+        .kpi-data { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+        .kpi-label { font-size: 0.7rem; letter-spacing: 1px; color: var(--text-secondary); margin-bottom: 0.4rem; font-family: monospace; line-height: 1.2; }
+        .kpi-value { font-size: clamp(1.1rem, 3.5vw, 1.8rem); font-weight: 600; line-height: 1.1; font-family: monospace; letter-spacing: -1px; word-break: break-all; }
 
         .data-panel {
           background: rgba(10, 10, 12, 0.6);
