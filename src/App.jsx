@@ -7,11 +7,13 @@ import Blog from './pages/Blog';
 import Cart from './pages/Cart';
 import Favorites from './pages/Favorites';
 import { ShopProvider } from './context/ShopContext';
+import { AuthProvider } from './context/AuthContext';
 
 function App() {
   return (
-    <ShopProvider>
-      <Router>
+    <AuthProvider>
+      <ShopProvider>
+        <Router>
         <Layout>
           <Routes>
             <Route path="/" element={<Landing />} />
@@ -24,6 +26,7 @@ function App() {
         </Layout>
       </Router>
     </ShopProvider>
+    </AuthProvider>
   );
 }
 

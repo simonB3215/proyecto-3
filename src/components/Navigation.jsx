@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import { ShoppingCart, Heart, LogIn, Menu, X } from 'lucide-react';
+import { ShoppingCart, Heart, Menu, X, LogOut } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
+import { useAuth } from '../context/AuthContext';
 
 const Navigation = () => {
   const { cartItemsCount, favorites } = useShop();
+  const { user, profile, signInWithGoogle, signOut } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -114,9 +116,26 @@ const Navigation = () => {
                 </span>
               )}
             </Link>
-            <button className="btn btn-primary" id="btn-login-desktop" style={{ padding: '0.4rem 1rem', fontSize: '0.9rem' }}>
-              <LogIn size={16} /> Entrar
-            </button>
+            {user ? (
+              <div className="flex items-center gap-3" id="btn-login-desktop">
+                <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                  Hola, <b style={{ color: 'var(--text-primary)' }}>{profile?.nombre || 'Usuario'}</b>
+                </span>
+                <button onClick={signOut} className="btn btn-outline" style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>
+                  Salir
+                </button>
+              </div>
+            ) : (
+              <button 
+                onClick={signInWithGoogle} 
+                className="btn btn-primary flex items-center gap-2" 
+                id="btn-login-desktop" 
+                style={{ padding: '0.4rem 1rem', fontSize: '0.9rem', backgroundColor: '#ffffff', color: '#000000', border: '1px solid transparent' }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></svg>
+                Entrar
+              </button>
+            )}
             <button 
               className="btn btn-ghost sm-hidden" 
               style={{ padding: '0.5rem', display: 'block' }}
@@ -136,9 +155,25 @@ const Navigation = () => {
           <NavLink to="/shop" onClick={() => setMobileMenuOpen(false)} className={linkClass}>Tienda</NavLink>
           <NavLink to="/blog" onClick={() => setMobileMenuOpen(false)} className={linkClass}>Blog</NavLink>
           <NavLink to="/dashboard" onClick={() => setMobileMenuOpen(false)} className={linkClass}>Dashboard</NavLink>
-          <button className="btn btn-primary" style={{ padding: '0.8rem 1.5rem', fontSize: '1.2rem', marginTop: '1rem', width: '100%', justifyContent: 'center' }}>
-            <LogIn size={20} /> Entrar
-          </button>
+          {user ? (
+            <div className="flex flex-col gap-4" style={{ marginTop: '1rem' }}>
+              <div className="flex items-center gap-3 justify-center" style={{ padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: 'var(--radius)' }}>
+                <span style={{ fontSize: '1.1rem', color: 'var(--text-primary)' }}>Hola, <b>{profile?.nombre || 'Usuario'}</b></span>
+              </div>
+              <button onClick={() => { signOut(); setMobileMenuOpen(false); }} className="btn btn-outline flex items-center justify-center gap-2" style={{ padding: '0.8rem 1.5rem', fontSize: '1.2rem', width: '100%' }}>
+                <LogOut size={20} /> Salir
+              </button>
+            </div>
+          ) : (
+            <button 
+              onClick={() => { signInWithGoogle(); }} 
+              className="btn btn-primary flex items-center gap-3" 
+              style={{ padding: '0.8rem 1.5rem', fontSize: '1.2rem', marginTop: '1rem', width: '100%', justifyContent: 'center', backgroundColor: '#ffffff', color: '#000000', border: '1px solid transparent' }}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></svg>
+              Conectar con Google
+            </button>
+          )}
         </nav>
       </div>
 
