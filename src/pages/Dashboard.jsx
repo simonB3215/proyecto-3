@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Package, AlertTriangle, Users, ShieldAlert, Loader2, Database, Laptop, RefreshCw, Edit, X, Save, Play, Square, Activity } from 'lucide-react';
+import { Package, AlertTriangle, Users, ShieldAlert, Loader2, Database, DollarSign, Laptop, RefreshCw, Edit, X, Save, Play, Square, Activity } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 
 const Dashboard = () => {
@@ -21,6 +21,8 @@ const Dashboard = () => {
 
   const metrics = {
     totalProductos: productos.length,
+    totalStock: productos.reduce((acc, p) => acc + (parseInt(p.stock) || 0), 0),
+    valorInventario: productos.reduce((acc, p) => acc + ((parseInt(p.stock) || 0) * (Number(p.precio) || 0)), 0),
     stockCritico: productos.filter(p => p.stock <= 5).length,
     totalUsuarios: usuarios.length,
     admins: usuarios.filter(u => u.rol === 'admin').length
@@ -224,8 +226,24 @@ const Dashboard = () => {
         <div className="kpi-card">
           <div className="kpi-icon"><Package size={20} /></div>
           <div className="kpi-data">
-            <span className="kpi-label">TOTAL PRODUCTOS</span>
+            <span className="kpi-label">TOTAL SKU (CATÁLOGO)</span>
             <span className="kpi-value">{metrics.totalProductos}</span>
+          </div>
+        </div>
+
+        <div className="kpi-card">
+          <div className="kpi-icon"><Database size={20} /></div>
+          <div className="kpi-data">
+            <span className="kpi-label">STOCK TOTAL (UNIDADES)</span>
+            <span className="kpi-value">{metrics.totalStock.toLocaleString()}</span>
+          </div>
+        </div>
+
+        <div className="kpi-card" style={{ borderColor: 'rgba(255, 215, 0, 0.2)' }}>
+          <div className="kpi-icon" style={{ color: 'var(--gold-main)' }}><DollarSign size={20} /></div>
+          <div className="kpi-data">
+            <span className="kpi-label" style={{ color: 'var(--gold-main)' }}>VALOR INVENTARIO</span>
+            <span className="kpi-value" style={{ color: 'var(--text-primary)' }}>${metrics.valorInventario.toLocaleString()}</span>
           </div>
         </div>
 
@@ -292,9 +310,13 @@ const Dashboard = () => {
         
         {/* TABLA: INVENTARIO */}
         <div className="data-panel">
-          <div className="panel-header">
+          <div className="panel-header" style={{ flexWrap: 'wrap', gap: '1rem' }}>
             <h3>DATOS_INVENTARIO [DB: productos]</h3>
-            <span className="badge">Filas: {productos.length}</span>
+            <div className="flex gap-2" style={{ flexWrap: 'wrap' }}>
+              <span className="badge" style={{ background: 'rgba(255, 215, 0, 0.15)', color: 'var(--gold-main)' }}>Valor Total: ${metrics.valorInventario.toLocaleString()}</span>
+              <span className="badge" style={{ background: 'rgba(255, 255, 255, 0.15)' }}>Stock Total: {metrics.totalStock.toLocaleString()}</span>
+              <span className="badge">SKUs: {productos.length}</span>
+            </div>
           </div>
           <div className="table-responsive">
             <table className="data-table">
@@ -340,9 +362,12 @@ const Dashboard = () => {
 
         {/* TABLA: USUARIOS */}
         <div className="data-panel">
-          <div className="panel-header">
+          <div className="panel-header" style={{ flexWrap: 'wrap', gap: '1rem' }}>
             <h3>REGISTRO_USUARIOS [DB: usuarios]</h3>
-            <span className="badge">Filas: {usuarios.length}</span>
+            <div className="flex gap-2" style={{ flexWrap: 'wrap' }}>
+              <span className="badge" style={{ background: 'rgba(255, 215, 0, 0.15)', color: 'var(--gold-main)' }}>Admins: {metrics.admins}</span>
+              <span className="badge">Total Usuarios: {usuarios.length}</span>
+            </div>
           </div>
           <div className="table-responsive">
             <table className="data-table">
