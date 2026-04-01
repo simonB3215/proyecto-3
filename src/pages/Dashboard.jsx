@@ -193,21 +193,21 @@ const Dashboard = () => {
               <tbody>
                 {productos.map(p => (
                   <tr key={p.id}>
-                    <td className="mono muted">#{String(p.id).padStart(5, '0')}</td>
-                    <td style={{ fontWeight: 500 }}>{p.nombre}</td>
-                    <td className="lowercase">{p.categorias?.nombre || 'N/A'}</td>
-                    <td className="mono">${Number(p.precio).toLocaleString()}</td>
-                    <td>
+                    <td data-label="SKU/ID" className="mono muted">#{String(p.id).padStart(5, '0')}</td>
+                    <td data-label="PRODUCTO" style={{ fontWeight: 500 }}>{p.nombre}</td>
+                    <td data-label="CATEGORÍA" className="lowercase">{p.categorias?.nombre || 'N/A'}</td>
+                    <td data-label="PRECIO" className="mono">${Number(p.precio).toLocaleString()}</td>
+                    <td data-label="ESTADO">
                       <span className={`status-pill ${p.estado === 'activo' ? 'active' : 'inactive'}`}>
                         {p.estado.toUpperCase()}
                       </span>
                     </td>
-                    <td>
+                    <td data-label="STOCK">
                       <span className={`stock-badge ${p.stock <= 5 ? 'critical' : p.stock <= 15 ? 'warning' : 'good'}`}>
                         {p.stock}
                       </span>
                     </td>
-                    <td>
+                    <td data-label="ACCIONES">
                       <button onClick={() => handleEditClick(p)} className="btn btn-ghost" style={{ padding: '0.4rem', color: 'var(--gold-main)' }} title="Editar Producto">
                         <Edit size={16} />
                       </button>
@@ -240,16 +240,16 @@ const Dashboard = () => {
               <tbody>
                 {usuarios.map(u => (
                   <tr key={u.id}>
-                    <td className="mono muted">usr_{String(u.id).padStart(4, '0')}</td>
-                    <td style={{ fontWeight: 500 }}>{u.nombre} {u.apellido}</td>
-                    <td className="mono" style={{ fontSize: '0.85rem' }}>{u.email}</td>
-                    <td className="mono muted">{u.telefono || 'N/A'}</td>
-                    <td>
+                    <td data-label="UUID" className="mono muted">usr_{String(u.id).padStart(4, '0')}</td>
+                    <td data-label="NOMBRE COMPLETO" style={{ fontWeight: 500 }}>{u.nombre} {u.apellido}</td>
+                    <td data-label="CORREO ELECTRÓNICO" className="mono" style={{ fontSize: '0.85rem' }}>{u.email}</td>
+                    <td data-label="TELÉFONO" className="mono muted">{u.telefono || 'N/A'}</td>
+                    <td data-label="ROL">
                       <span className={`status-pill ${u.rol === 'admin' ? 'admin' : 'user'}`}>
                         {String(u.rol).toUpperCase()}
                       </span>
                     </td>
-                    <td className="mono muted">{new Date(u.fecha_registro).toLocaleDateString()}</td>
+                    <td data-label="FECHA REGISTRO" className="mono muted">{new Date(u.fecha_registro).toLocaleDateString()}</td>
                   </tr>
                 ))}
               </tbody>
@@ -403,6 +403,40 @@ const Dashboard = () => {
         }
         .data-table tr:last-child td { border-bottom: none; }
         .data-table tr:hover td { background: rgba(255,215,0,0.02); }
+
+        @media (max-width: 768px) {
+          .data-table thead { display: none; }
+          .data-table tr { 
+            display: block; 
+            border-bottom: 1px solid var(--border-gold) !important; 
+            margin-bottom: 0.5rem; 
+            background: rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            padding: 0.5rem 0;
+          }
+          .data-table tr:hover td { background: transparent; }
+          .data-table td { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border: none; 
+            padding: 0.5rem 1.25rem; 
+            text-align: right;
+          }
+          .data-table td::before { 
+            content: attr(data-label); 
+            font-weight: 600; 
+            color: var(--text-secondary); 
+            text-transform: uppercase; 
+            font-size: 0.7rem; 
+            margin-right: 1rem; 
+            font-family: monospace;
+            text-align: left;
+            flex-shrink: 0;
+          }
+          .header-text { flex-direction: column !important; align-items: flex-start !important; gap: 0.5rem; }
+        }
 
         .status-pill {
           padding: 0.25rem 0.6rem;
