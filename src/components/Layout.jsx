@@ -3,23 +3,22 @@ import Navigation from './Navigation';
 import Footer from './Footer';
 import { useAuth } from '../context/AuthContext';
 import { X } from 'lucide-react';
+import dragonLogo from '../assets/dragon-logo.png';
 
 const Layout = ({ children }) => {
   const { user, signInWithGoogle } = useAuth();
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    // Mostrar solo si no hay usuario logueado y no ha cerrado el modal esta sesión
-    const hasClosed = sessionStorage.getItem('welcomeModalClosed');
-    if (!user && !hasClosed) {
-      // Retraso de 1 segundo para crear un efecto sorpresa más sutil
-      const timer = setTimeout(() => setShowModal(true), 1200);
+    // Mostrar siempre que no haya usuario logueado (en cada refresh)
+    if (!user) {
+      // Retraso para crear un efecto sorpresa
+      const timer = setTimeout(() => setShowModal(true), 800);
       return () => clearTimeout(timer);
     }
   }, [user]);
 
   const handleClose = () => {
-    sessionStorage.setItem('welcomeModalClosed', 'true');
     setShowModal(false);
   };
 
@@ -80,8 +79,8 @@ const Layout = ({ children }) => {
 
               {/* Logo / Icon */}
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
-                <div style={{ width: '64px', height: '64px', borderRadius: '50%', border: '1px solid rgba(234, 179, 8, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(234, 179, 8, 0.05)', boxShadow: '0 0 20px rgba(234, 179, 8, 0.15)' }}>
-                  <span style={{ fontSize: '28px' }}>🐉</span>
+                <div style={{ width: '84px', height: '84px', borderRadius: '50%', border: '1px solid rgba(234, 179, 8, 0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.8)', boxShadow: '0 0 25px rgba(234, 179, 8, 0.3)', overflow: 'hidden' }}>
+                  <img src={dragonLogo} alt="El Dorado Premium Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
               </div>
 
