@@ -13,12 +13,18 @@ const Dashboard = () => {
   const [isSimulating, setIsSimulating] = useState(false);
   const [liveUsers, setLiveUsers] = useState(0);
   const [liveEvents, setLiveEvents] = useState([]);
-  const [metrics, setMetrics] = useState({
-    totalProductos: 0,
-    stockCritico: 0,
-    totalUsuarios: 0,
-    admins: 0
-  });
+  
+  const productosRef = React.useRef(productos);
+  useEffect(() => {
+    productosRef.current = productos;
+  }, [productos]);
+
+  const metrics = {
+    totalProductos: productos.length,
+    stockCritico: productos.filter(p => p.stock <= 5).length,
+    totalUsuarios: usuarios.length,
+    admins: usuarios.filter(u => u.rol === 'admin').length
+  };
 
   const fetchData = async () => {
     try {
@@ -43,13 +49,6 @@ const Dashboard = () => {
       setProductos(prods);
       setUsuarios(users);
 
-      setMetrics({
-        totalProductos: prods.length,
-        stockCritico: prods.filter(p => p.stock <= 5).length,
-        totalUsuarios: users.length,
-        admins: users.filter(u => u.rol === 'admin').length
-      });
-
     } catch (e) {
       console.error("Error cargando dashboard:", e);
     } finally {
@@ -73,30 +72,66 @@ const Dashboard = () => {
       
       intervalId = setInterval(() => {
         setLiveUsers(prev => {
-          const delta = Math.floor(Math.random() * 5) - 2; // -2, -1, 0, 1, 2
+          const delta = Math.floor(Math.random() * 5) - 2;
           let next = prev + delta;
           if (next < 25) next = 25;
           if (next > 45) next = 45;
           return next;
         });
 
-        if (Math.random() > 0.5 && productos.length > 0) {
-          const randomUser = nombresRandom[Math.floor(Math.random() * nombresRandom.length)];
-          const randomAction = accionesRandom[Math.floor(Math.random() * accionesRandom.length)];
-          const randomProduct = productos[Math.floor(Math.random() * productos.length)].nombre;
-          
+        // Simulación: Inyectar un usuario falsamente registrado a la BD Virtual
+        if (Math.random() > 0.95) {
+          const rUser = nombresRandom[Math.floor(Math.random() * nombresRandom.length)];
+          const partes = rUser.split(" ");
+          const nuevoSimUsuario = {
+            id: Date.now() % 10000, // Pseudo-ID seguro
+            nombre: partes[0],
+            apellido: partes[1] || '',
+            email: `${partes[0].toLowerCase()}${Math.floor(Math.random()*100)}@simulado.com`,
+            telefono: '+56 9 0000 0000',
+            rol: 'user',
+            fecha_registro: new Date().toISOString()
+          };
+          setUsuarios(prev => [nuevoSimUsuario, ...prev]);
           setLiveEvents(prev => [{
-            id: Date.now(),
-            text: `${randomUser} ${randomAction} "${randomProduct}"`,
+            id: Date.now() + 1,
+            text: `⭐ ¡Nuevo perfil! ${rUser} se acaba de registrar en la interfaz.`,
             time: new Date().toLocaleTimeString()
           }, ...prev].slice(0, 15));
         }
-      }, 2000); // Check every 2 seconds
+
+        // Simulación: Movimiento de compras y eventos
+        if (Math.random() > 0.5 && productosRef.current.length > 0) {
+          const rUser = nombresRandom[Math.floor(Math.random() * nombresRandom.length)];
+          let actionText = accionesRandom[Math.floor(Math.random() * accionesRandom.length)];
+          let targetProduct = productosRef.current[Math.floor(Math.random() * productosRef.current.length)];
+
+          const isCompra = actionText === "terminó de pagar";
+          
+          if (isCompra && targetProduct.stock > 0) {
+            // REDUCE STOCK en memoria RAM
+            setProductos(prevProds => prevProds.map(p => {
+              if (p.id === targetProduct.id && p.stock > 0) {
+                return { ...p, stock: p.stock - 1 };
+              }
+              return p;
+            }));
+          } else if (isCompra && targetProduct.stock <= 0) {
+            actionText = "añadió a favoritos"; // Si agotó, se disfraza la compra
+          }
+
+          setLiveEvents(prev => [{
+            id: Date.now(),
+            text: `${rUser} ${actionText} "${targetProduct.nombre}"`,
+            time: new Date().toLocaleTimeString()
+          }, ...prev].slice(0, 15));
+        }
+      }, 2500); // Trigger a cada 2.5 segs
     } else {
       setLiveUsers(0);
     }
     return () => clearInterval(intervalId);
-  }, [isSimulating, productos]);
+  }, [isSimulating]);
 
   const handleEditClick = (product) => {
     setEditingProduct(product);
