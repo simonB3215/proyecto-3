@@ -118,8 +118,8 @@ const Shop = () => {
             return (
               <div 
                 key={product.id} 
-                className="card" 
-                style={{ padding: '0', overflow: 'hidden', position: 'relative' }}
+                className="card product-card" 
+                style={{ padding: '0', overflow: 'hidden', position: 'relative', display: 'flex', flexDirection: 'column' }}
                 onMouseEnter={() => setHoveredProduct(product.id)}
                 onMouseLeave={() => setHoveredProduct(null)}
               >
@@ -177,14 +177,27 @@ const Shop = () => {
                   </button>
                 </div>
                 
-                <div style={{ padding: '1.5rem' }}>
+                <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
                   <span style={{ fontSize: '0.8rem', color: 'var(--gold-main)', fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase' }}>
                     {catName}
                   </span>
-                  <h3 style={{ fontSize: '1.1rem', fontWeight: 500, margin: '0.5rem 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 500, margin: '0.5rem 0 0.25rem 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {product.nombre}
                   </h3>
-                  <div className="flex justify-between items-center" style={{ marginTop: '1.5rem' }}>
+                  <p style={{
+                    fontSize: '0.85rem',
+                    color: 'var(--text-secondary)',
+                    marginBottom: '1rem',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    lineHeight: '1.4',
+                    flex: 1
+                  }}>
+                    {product.descripcion || 'Sin descripción disponible para este producto exclusivo.'}
+                  </p>
+                  <div className="flex justify-between items-center" style={{ marginTop: 'auto' }}>
                     <span style={{ fontSize: '1.25rem', fontWeight: 600 }}>${Number(product.precio).toLocaleString()}</span>
                     <button 
                       className="btn btn-primary" 
@@ -211,6 +224,18 @@ const Shop = () => {
           .shop-header { align-items: stretch !important; }
           .w-full-mobile { width: 100%; flex-wrap: wrap; }
           .w-full-mobile input { max-width: 100% !important; }
+        }
+        
+        .product-card {
+          transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+          border: 1px solid var(--border-subtle);
+          background: rgba(10, 10, 10, 0.4);
+        }
+        .product-card:hover {
+          transform: translateY(-8px) scale(1.03);
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(234, 179, 8, 0.15);
+          border-color: rgba(234, 179, 8, 0.3);
+          z-index: 10;
         }
         
         .animate-spin {

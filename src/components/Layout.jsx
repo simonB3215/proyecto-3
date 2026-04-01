@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import Navigation from './Navigation';
 import Footer from './Footer';
 import { useAuth } from '../context/AuthContext';
@@ -8,15 +9,16 @@ import dragonLogo from '../assets/dragon-logo.png';
 const Layout = ({ children }) => {
   const { user, signInWithGoogle } = useAuth();
   const [showModal, setShowModal] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
-    // Mostrar siempre que no haya usuario logueado (en cada refresh)
-    if (!user) {
+    // Mostrar siempre que no haya usuario logueado (en cada refresh), EXCEPTO en dashboard
+    if (!user && location.pathname !== '/dashboard') {
       // Retraso para crear un efecto sorpresa
       const timer = setTimeout(() => setShowModal(true), 800);
       return () => clearTimeout(timer);
     }
-  }, [user]);
+  }, [user, location.pathname]);
 
   const handleClose = () => {
     setShowModal(false);
