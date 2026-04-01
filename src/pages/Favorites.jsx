@@ -40,6 +40,17 @@ const Favorites = () => {
     fetchFavorites();
   }, [favorites]);
 
+  useEffect(() => {
+    if (selectedProduct) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedProduct]);
+
   const fetchFavorites = async () => {
     try {
       setLoading(true);
