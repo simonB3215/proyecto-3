@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Package, AlertTriangle, Users, ShieldAlert, Loader2, Database, Laptop, RefreshCw, Edit, X, Save } from 'lucide-react';
+import { Package, AlertTriangle, Users, ShieldAlert, Loader2, Database, Laptop, RefreshCw, Edit, X, Save, Play, Square, Activity } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 
 const Dashboard = () => {
@@ -10,6 +10,9 @@ const Dashboard = () => {
   const [editingProduct, setEditingProduct] = useState(null);
   const [editForm, setEditForm] = useState({ nombre: '', precio: 0, stock: 0, estado: 'activo' });
   const [isSaving, setIsSaving] = useState(false);
+  const [isSimulating, setIsSimulating] = useState(false);
+  const [liveUsers, setLiveUsers] = useState(0);
+  const [liveEvents, setLiveEvents] = useState([]);
   const [metrics, setMetrics] = useState({
     totalProductos: 0,
     stockCritico: 0,
@@ -58,6 +61,42 @@ const Dashboard = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // --- IA Simulator Logic ---
+  const nombresRandom = ["Sofía L.", "Mateo D.", "Camila P.", "Valentina M.", "Carlos B.", "María F.", "Joaquín R.", "Lucía C.", "Javier S.", "Renata G."];
+  const accionesRandom = ["agregó al carrito", "terminó de pagar", "está revisando", "añadió a favoritos"];
+
+  useEffect(() => {
+    let intervalId;
+    if (isSimulating) {
+      setLiveUsers(prev => prev === 0 ? Math.floor(Math.random() * 5) + 28 : prev);
+      
+      intervalId = setInterval(() => {
+        setLiveUsers(prev => {
+          const delta = Math.floor(Math.random() * 5) - 2; // -2, -1, 0, 1, 2
+          let next = prev + delta;
+          if (next < 25) next = 25;
+          if (next > 45) next = 45;
+          return next;
+        });
+
+        if (Math.random() > 0.5 && productos.length > 0) {
+          const randomUser = nombresRandom[Math.floor(Math.random() * nombresRandom.length)];
+          const randomAction = accionesRandom[Math.floor(Math.random() * accionesRandom.length)];
+          const randomProduct = productos[Math.floor(Math.random() * productos.length)].nombre;
+          
+          setLiveEvents(prev => [{
+            id: Date.now(),
+            text: `${randomUser} ${randomAction} "${randomProduct}"`,
+            time: new Date().toLocaleTimeString()
+          }, ...prev].slice(0, 15));
+        }
+      }, 2000); // Check every 2 seconds
+    } else {
+      setLiveUsers(0);
+    }
+    return () => clearInterval(intervalId);
+  }, [isSimulating, productos]);
 
   const handleEditClick = (product) => {
     setEditingProduct(product);
@@ -120,15 +159,28 @@ const Dashboard = () => {
             </p>
           </div>
         </div>
-        <button 
-          onClick={fetchData} 
-          disabled={refreshing}
-          className="btn" 
-          style={{ padding: '0.5rem 1rem', background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', fontFamily: 'monospace' }}
-        >
-          <RefreshCw size={14} className={refreshing ? "animate-spin" : ""} color="var(--gold-main)" /> 
-          SYNC_DATA
-        </button>
+        <div className="flex flex-col-mobile gap-3" style={{ alignItems: 'stretch' }}>
+          <button 
+            onClick={() => {
+              setIsSimulating(!isSimulating);
+              if (isSimulating) setLiveEvents([]);
+            }} 
+            className="btn" 
+            style={{ padding: '0.5rem 1rem', background: isSimulating ? 'rgba(239, 68, 68, 0.1)' : 'rgba(74, 222, 128, 0.1)', border: `1px solid ${isSimulating ? 'rgba(239, 68, 68, 0.3)' : 'rgba(74, 222, 128, 0.3)'}`, color: isSimulating ? '#ef4444' : '#4ade80', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontSize: '0.8rem', fontFamily: 'monospace' }}
+          >
+            {isSimulating ? <><Square size={14} fill="currentColor" /> DETENER SIMULACIÓN</> : <><Play size={14} fill="currentColor" /> SIMULAR TRÁFICO IA</>}
+          </button>
+          
+          <button 
+            onClick={fetchData} 
+            disabled={refreshing}
+            className="btn" 
+            style={{ padding: '0.5rem 1rem', background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontSize: '0.8rem', fontFamily: 'monospace' }}
+          >
+            <RefreshCw size={14} className={refreshing ? "animate-spin" : ""} color="var(--gold-main)" /> 
+            SYNC_DATA
+          </button>
+        </div>
       </header>
 
       {/* MÉTRICAS KPI (Key Performance Indicators) */}
@@ -166,7 +218,39 @@ const Dashboard = () => {
           </div>
         </div>
 
+        <div className="kpi-card">
+          <div className="kpi-icon"><Activity size={20} color={isSimulating ? '#4ade80' : 'var(--text-secondary)'} /></div>
+          <div className="kpi-data">
+            <span className="kpi-label">USUARIOS ONLINE</span>
+            <span className="kpi-value" style={{ color: isSimulating ? '#4ade80' : 'var(--text-primary)' }}>
+              {isSimulating ? liveUsers : '0'}
+            </span>
+          </div>
+        </div>
+
       </div>
+
+      {/* SIMULADOR FEED */}
+      {isSimulating && (
+        <div className="card animate-fade-in" style={{ marginBottom: '3rem', background: 'rgba(15, 20, 25, 0.8)', border: '1px solid var(--border-subtle)', padding: '1.5rem' }}>
+          <h3 className="heading-md" style={{ margin: '0 0 1rem 0', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Activity color="#4ade80" size={18} className="animate-spin" style={{ animationDuration: '3s' }} /> 
+            Registro de Actividad (IA Simulación)
+          </h3>
+          <div style={{ height: '160px', overflowY: 'auto', padding: '1rem', background: 'rgba(0,0,0,0.3)', borderRadius: 'var(--radius)' }} className="mono">
+            {liveEvents.length === 0 ? (
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: 0 }}>Esperando interacciones de usuarios simulados...</p>
+            ) : (
+              liveEvents.map(ev => (
+                <div key={ev.id} className="animate-fade-in" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '0.6rem 0', fontSize: '0.85rem', display: 'flex', gap: '1rem' }}>
+                  <span style={{ color: 'var(--text-secondary)', opacity: 0.7 }}>[{ev.time}]</span>
+                  <span style={{ flex: 1, color: ev.text.includes('pagar') ? '#4ade80' : 'var(--text-primary)' }}>{ev.text}</span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
 
       {/* SECCIÓN DE TABLAS DE DATOS */}
       <div className="grid gap-6" style={{ gridTemplateColumns: '1fr', marginBottom: '3rem' }}>
