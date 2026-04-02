@@ -5,18 +5,18 @@ import { supabase } from '../lib/supabaseClient';
 import { useShop } from '../context/ShopContext';
 
 const placeholderImages = {
-  'electrónica': 'https://placehold.co/500x500/141414/eab308/png?text=ELECTRONICA',
-  'ropa': 'https://placehold.co/500x500/141414/eab308/png?text=ROPA',
-  'poleras': 'https://placehold.co/500x500/141414/eab308/png?text=POLERAS',
-  'polera': 'https://placehold.co/500x500/141414/eab308/png?text=POLERA',
-  'polerones': 'https://placehold.co/500x500/141414/eab308/png?text=POLERONES',
-  'polerón': 'https://placehold.co/500x500/141414/eab308/png?text=POLERON',
-  'pantalones': 'https://placehold.co/500x500/141414/eab308/png?text=PANTALONES',
-  'pantalon': 'https://placehold.co/500x500/141414/eab308/png?text=PANTALON',
-  'calzado': 'https://placehold.co/500x500/141414/eab308/png?text=CALZADO',
-  'hogar': 'https://placehold.co/500x500/141414/eab308/png?text=HOGAR',
-  'deportes': 'https://placehold.co/500x500/141414/eab308/png?text=DEPORTES',
-  'default': 'https://placehold.co/500x500/141414/eab308/png?text=PRODUCTO'
+  'electrónica': '/teclado.jpg',
+  'ropa': '/2.jpg',
+  'poleras': '/2.jpg',
+  'polera': '/2.jpg',
+  'polerones': '/2.jpg',
+  'polerón': '/2.jpg',
+  'pantalones': '/2.jpg',
+  'pantalon': '/2.jpg',
+  'calzado': '/2.jpg',
+  'hogar': '/23.jpg',
+  'deportes': '/34.jpg',
+  'default': '/2.jpg'
 };
 
 const getFallbackImage = (categoryName) => {
