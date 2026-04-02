@@ -1,31 +1,100 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingBag, Star, ShieldCheck, Truck } from 'lucide-react';
 
 const Landing = () => {
+  const heroRef = useRef(null);
+  const interactiveBlobRef = useRef(null);
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (interactiveBlobRef.current && heroRef.current) {
+        const rect = heroRef.current.getBoundingClientRect();
+        
+        // Calcular posición respecto a la sección Hero
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        // Animar el blob interactivo suavemente hacia el cursor
+        interactiveBlobRef.current.animate({
+          left: `${x}px`,
+          top: `${y}px`
+        }, { duration: 3000, fill: "forwards", easing: "ease" });
+      }
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
   return (
     <div className="animate-fade-in">
       {/* Hero Section */}
-      <section style={{ 
+      <section ref={heroRef} style={{ 
         minHeight: '80vh', 
         display: 'flex', 
         alignItems: 'center',
         position: 'relative',
         overflow: 'hidden'
       }}>
-        {/* Background Decorative Blur */}
-        <div style={{
-          position: 'absolute',
-          top: '10%',
-          left: '20%',
-          width: 'min(500px, 100vw)',
-          height: 'min(500px, 100vw)',
-          background: 'var(--gold-dark)',
-          filter: 'blur(200px)',
-          opacity: 0.15,
-          zIndex: -1,
-          borderRadius: '50%'
-        }}></div>
+        {/* Animated Background Decorative Blurs */}
+        <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: -1, background: 'var(--bg-primary)' }}>
+          {/* Interactive Mouse Tracking Blob */}
+          <div ref={interactiveBlobRef} style={{
+            position: 'absolute',
+            left: '50%',
+            top: '50%',
+            width: 'min(600px, 60vw)',
+            height: 'min(600px, 60vw)',
+            background: 'radial-gradient(circle, var(--gold-light) 0%, var(--gold-main) 60%, transparent 80%)',
+            filter: 'blur(90px)',
+            opacity: 0.45,
+            borderRadius: '50%',
+            mixBlendMode: 'screen',
+            transform: 'translate(-50%, -50%)',
+            pointerEvents: 'none',
+            zIndex: 1
+          }}></div>
+
+          <div className="animate-blob-1" style={{
+            position: 'absolute',
+            top: '-20%',
+            left: '-10%',
+            width: 'min(700px, 80vw)',
+            height: 'min(700px, 80vw)',
+            background: 'var(--gold-dark)',
+            filter: 'blur(130px)',
+            opacity: 0.4,
+            mixBlendMode: 'color-dodge',
+            borderRadius: '50%'
+          }}></div>
+          
+          <div className="animate-blob-2" style={{
+            position: 'absolute',
+            top: '10%',
+            right: '-10%',
+            width: 'min(600px, 70vw)',
+            height: 'min(600px, 70vw)',
+            background: 'var(--gold-main)',
+            filter: 'blur(110px)',
+            opacity: 0.35,
+            mixBlendMode: 'screen',
+            borderRadius: '50%'
+          }}></div>
+
+          <div className="animate-blob-3" style={{
+            position: 'absolute',
+            bottom: '-20%',
+            left: '10%',
+            width: 'min(650px, 75vw)',
+            height: 'min(650px, 75vw)',
+            background: 'var(--gold-light)',
+            filter: 'blur(120px)',
+            opacity: 0.25,
+            mixBlendMode: 'screen',
+            borderRadius: '50%'
+          }}></div>
+        </div>
 
         <div className="container flex-col gap-6" style={{ alignItems: 'center', textAlign: 'center', maxWidth: '800px' }}>
           <div style={{ 
