@@ -5,18 +5,18 @@ import { supabase } from '../lib/supabaseClient';
 import { useShop } from '../context/ShopContext';
 
 const placeholderImages = {
-  'electrónica': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Computer_keyboard_and_mouse.jpg/320px-Computer_keyboard_and_mouse.jpg',
-  'ropa': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Blue_Tshirt.jpg/320px-Blue_Tshirt.jpg',
-  'poleras': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Blue_Tshirt.jpg/320px-Blue_Tshirt.jpg',
-  'polera': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Blue_Tshirt.jpg/320px-Blue_Tshirt.jpg',
-  'polerones': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Hoodie_front.jpg/320px-Hoodie_front.jpg',
-  'polerón': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Hoodie_front.jpg/320px-Hoodie_front.jpg',
-  'pantalones': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Jeans.jpg/320px-Jeans.jpg',
-  'pantalon': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Jeans.jpg/320px-Jeans.jpg',
-  'calzado': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Pair_of_sneakers_over_a_white_background.jpg/320px-Pair_of_sneakers_over_a_white_background.jpg',
-  'hogar': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Armchair_isolated_on_a_white_background.jpg/320px-Armchair_isolated_on_a_white_background.jpg',
-  'deportes': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Soccer_ball_in_the_grass.jpg/320px-Soccer_ball_in_the_grass.jpg',
-  'default': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Blue_Tshirt.jpg/320px-Blue_Tshirt.jpg'
+  'electrónica': 'https://placehold.co/500x500/141414/eab308/png?text=ELECTRONICA',
+  'ropa': 'https://placehold.co/500x500/141414/eab308/png?text=ROPA',
+  'poleras': 'https://placehold.co/500x500/141414/eab308/png?text=POLERAS',
+  'polera': 'https://placehold.co/500x500/141414/eab308/png?text=POLERA',
+  'polerones': 'https://placehold.co/500x500/141414/eab308/png?text=POLERONES',
+  'polerón': 'https://placehold.co/500x500/141414/eab308/png?text=POLERON',
+  'pantalones': 'https://placehold.co/500x500/141414/eab308/png?text=PANTALONES',
+  'pantalon': 'https://placehold.co/500x500/141414/eab308/png?text=PANTALON',
+  'calzado': 'https://placehold.co/500x500/141414/eab308/png?text=CALZADO',
+  'hogar': 'https://placehold.co/500x500/141414/eab308/png?text=HOGAR',
+  'deportes': 'https://placehold.co/500x500/141414/eab308/png?text=DEPORTES',
+  'default': 'https://placehold.co/500x500/141414/eab308/png?text=PRODUCTO'
 };
 
 const getFallbackImage = (categoryName) => {
