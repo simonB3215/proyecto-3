@@ -5,18 +5,18 @@ import { supabase } from '../lib/supabaseClient';
 import { useShop } from '../context/ShopContext';
 
 const placeholderImages = {
-  'electrónica': 'https://loremflickr.com/500/500/laptop,gadget/all',
-  'ropa': 'https://loremflickr.com/500/500/clothing,top/all',
-  'poleras': 'https://loremflickr.com/500/500/tshirt/all',
-  'polera': 'https://loremflickr.com/500/500/tshirt/all',
-  'polerones': 'https://loremflickr.com/500/500/hoodie/all',
-  'polerón': 'https://loremflickr.com/500/500/hoodie,jacket/all',
-  'pantalones': 'https://loremflickr.com/500/500/jeans,pants/all',
-  'pantalon': 'https://loremflickr.com/500/500/jeans/all',
-  'calzado': 'https://loremflickr.com/500/500/sneakers,shoes/all',
-  'hogar': 'https://loremflickr.com/500/500/furniture,chair/all',
-  'deportes': 'https://loremflickr.com/500/500/sports,equipment/all',
-  'default': 'https://loremflickr.com/500/500/product/all'
+  'electrónica': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Computer_keyboard_and_mouse.jpg/320px-Computer_keyboard_and_mouse.jpg',
+  'ropa': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Blue_Tshirt.jpg/320px-Blue_Tshirt.jpg',
+  'poleras': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Blue_Tshirt.jpg/320px-Blue_Tshirt.jpg',
+  'polera': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Blue_Tshirt.jpg/320px-Blue_Tshirt.jpg',
+  'polerones': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Hoodie_front.jpg/320px-Hoodie_front.jpg',
+  'polerón': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Hoodie_front.jpg/320px-Hoodie_front.jpg',
+  'pantalones': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Jeans.jpg/320px-Jeans.jpg',
+  'pantalon': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Jeans.jpg/320px-Jeans.jpg',
+  'calzado': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Pair_of_sneakers_over_a_white_background.jpg/320px-Pair_of_sneakers_over_a_white_background.jpg',
+  'hogar': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Armchair_isolated_on_a_white_background.jpg/320px-Armchair_isolated_on_a_white_background.jpg',
+  'deportes': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Soccer_ball_in_the_grass.jpg/320px-Soccer_ball_in_the_grass.jpg',
+  'default': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Blue_Tshirt.jpg/320px-Blue_Tshirt.jpg'
 };
 
 const getFallbackImage = (categoryName) => {
