@@ -4,24 +4,14 @@ import { ShoppingCart, Heart, Search, Filter, Loader2, Check, X } from 'lucide-r
 import { supabase } from '../lib/supabaseClient';
 import { useShop } from '../context/ShopContext';
 
-const placeholderImages = {
-  'electrónica': 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=500&h=500&fit=crop',
-  'ropa': 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e07?w=500&h=500&fit=crop',
-  'poleras': 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop',
-  'polera': 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop',
-  'polerones': 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500&h=500&fit=crop',
-  'polerón': 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500&h=500&fit=crop',
-  'pantalones': 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=500&h=500&fit=crop',
-  'pantalon': 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=500&h=500&fit=crop',
-  'calzado': 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500&h=500&fit=crop',
-  'hogar': 'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=500&h=500&fit=crop',
-  'deportes': 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=500&h=500&fit=crop',
-  'default': 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=500&h=500&fit=crop'
+const generateSvg = (text) => {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500"><rect width="500" height="500" fill="#141414"/><text x="50%" y="50%" font-family="Inter, sans-serif" font-size="36" font-weight="600" fill="#eab308" text-anchor="middle" dominant-baseline="middle">${text}</text></svg>`;
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 };
 
 const getFallbackImage = (categoryName) => {
-  const normalized = (categoryName || '').trim().toLowerCase();
-  return placeholderImages[normalized] || placeholderImages['default'];
+  const normalized = (categoryName || 'EL DORADO').trim().toUpperCase();
+  return generateSvg(normalized);
 };
 
 const Shop = () => {
