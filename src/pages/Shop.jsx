@@ -4,14 +4,24 @@ import { ShoppingCart, Heart, Search, Filter, Loader2, Check, X } from 'lucide-r
 import { supabase } from '../lib/supabaseClient';
 import { useShop } from '../context/ShopContext';
 
-const generateSvg = (text) => {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500"><rect width="500" height="500" fill="#141414"/><text x="50%" y="50%" font-family="Inter, sans-serif" font-size="36" font-weight="600" fill="#eab308" text-anchor="middle" dominant-baseline="middle">${text}</text></svg>`;
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+const placeholderImages = {
+  'electrónica': 'https://loremflickr.com/500/500/laptop,gadget/all',
+  'ropa': 'https://loremflickr.com/500/500/clothing,top/all',
+  'poleras': 'https://loremflickr.com/500/500/tshirt/all',
+  'polera': 'https://loremflickr.com/500/500/tshirt/all',
+  'polerones': 'https://loremflickr.com/500/500/hoodie/all',
+  'polerón': 'https://loremflickr.com/500/500/hoodie,jacket/all',
+  'pantalones': 'https://loremflickr.com/500/500/jeans,pants/all',
+  'pantalon': 'https://loremflickr.com/500/500/jeans/all',
+  'calzado': 'https://loremflickr.com/500/500/sneakers,shoes/all',
+  'hogar': 'https://loremflickr.com/500/500/furniture,chair/all',
+  'deportes': 'https://loremflickr.com/500/500/sports,equipment/all',
+  'default': 'https://loremflickr.com/500/500/product/all'
 };
 
 const getFallbackImage = (categoryName) => {
-  const normalized = (categoryName || 'EL DORADO').trim().toUpperCase();
-  return generateSvg(normalized);
+  const normalized = (categoryName || '').trim().toLowerCase();
+  return placeholderImages[normalized] || placeholderImages['default'];
 };
 
 const Shop = () => {
