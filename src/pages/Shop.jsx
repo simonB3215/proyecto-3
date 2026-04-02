@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { ShoppingCart, Heart, Search, Filter, Loader2, Check, X } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useShop } from '../context/ShopContext';
@@ -6,8 +7,8 @@ import { useShop } from '../context/ShopContext';
 const placeholderImages = {
   'electrónica': 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=500&h=500&fit=crop',
   'ropa': 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e07?w=500&h=500&fit=crop',
-  'poleras': 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop',
-  'polera': 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop',
+  'poleras': 'https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?w=500&h=500&fit=crop',
+  'polera': 'https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?w=500&h=500&fit=crop',
   'polerones': 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500&h=500&fit=crop',
   'polerón': 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500&h=500&fit=crop',
   'pantalones': 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=500&h=500&fit=crop',
@@ -233,7 +234,7 @@ const Shop = () => {
       )}
       
       {/* MODAL DEL PRODUCTO COMPLETO */}
-      {selectedProduct && (() => {
+      {selectedProduct && createPortal((() => {
         const catName = selectedProduct.categorias?.nombre || 'General';
         return (
           <div 
@@ -332,7 +333,7 @@ const Shop = () => {
             </div>
           </div>
         );
-      })()}
+      })(), document.body)}
       
       <style>{`
         @media (max-width: 768px) {
